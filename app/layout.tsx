@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Death Age Predictor | Find Out When You&apos;ll Die',
-  description: 'Calculate your death age with our totally scientific and definitely not made up algorithm',
+  title: 'when r u gonna die | death age calculator',
+  description: 'find out when ur gonna die fr (its real science trust)',
 }
 
 export default function RootLayout({
