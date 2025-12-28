@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Death Age Predictor | Find Out When You\'ll Die',
+  title: 'Death Age Predictor | Find Out When You&apos;ll Die',
   description: 'Calculate your death age with our totally scientific and definitely not made up algorithm',
 }
 

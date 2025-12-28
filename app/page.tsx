@@ -31,7 +31,7 @@ export default function Home() {
   const questions = [
     {
       id: 'age',
-      question: 'How old are you? (be honest, we\'ll know if you\'re lying)',
+      question: 'How old are you? (be honest, we&apos;ll know if you&apos;re lying)',
       type: 'number',
       min: 1,
       max: 120
@@ -46,7 +46,7 @@ export default function Home() {
     },
     {
       id: 'sleep',
-      question: 'How many hours of sleep do you get per night? (be honest, TikTok doesn\'t count as sleep)',
+      question: 'How many hours of sleep do you get per night? (be honest, TikTok doesn&apos;t count as sleep)',
       type: 'range',
       min: 0,
       max: 12,
@@ -54,7 +54,7 @@ export default function Home() {
     },
     {
       id: 'exercise',
-      question: 'How often do you exercise per week? (walking to the fridge doesn\'t count)',
+      question: 'How often do you exercise per week? (walking to the fridge doesn&apos;t count)',
       type: 'range',
       min: 0,
       max: 7,
@@ -86,7 +86,7 @@ export default function Home() {
     },
     {
       id: 'screen',
-      question: 'How many hours per day do you spend on your phone? (we know it\'s a lot)',
+      question: 'How many hours per day do you spend on your phone? (we know it&apos;s a lot)',
       type: 'range',
       min: 0,
       max: 16,
@@ -130,13 +130,13 @@ export default function Home() {
   }
 
   const getRoast = (age: number): string => {
-    if (age < 50) return 'Bro, you\'re not making it past 50 💀'
+    if (age < 50) return 'Bro, you&apos;re not making it past 50 💀'
     if (age < 60) return 'Yikes, might want to reconsider those life choices'
     if (age < 70) return 'Not great, not terrible. Just... mid.'
     if (age < 80) return 'Average lifespan achieved. Congrats, I guess?'
     if (age < 90) return 'Decent! You might actually make it to retirement'
     if (age < 100) return 'Living your best life! Respect.'
-    return 'Legend status. You\'re built different.'
+    return 'Legend status. You&apos;re built different.'
   }
 
   const currentQuestion = questions[step]
@@ -180,7 +180,7 @@ export default function Home() {
       <div className={styles.card}>
         <h1 className={styles.title}>Death Age Predictor</h1>
         <p className={styles.subtitle}>
-          Find out when you'll die (totally accurate, trust us)
+          Find out when you&apos;ll die (totally accurate, trust us)
         </p>
         
         <div className={styles.progressBar}>
