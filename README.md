@@ -17,7 +17,7 @@ A Gen Z-style web application that predicts life expectancy based on lifestyle f
 
 ### Prerequisites
 
-- Node.js 16.x or higher
+- Node.js 18.17 or higher (required for Next.js 14)
 - npm or yarn package manager
 
 ### Installation
@@ -98,24 +98,32 @@ This Next.js app can also be deployed to:
 
 ## 📊 Algorithm Overview
 
-The longevity calculator uses a weighted modifier system based on the following health factors:
+The longevity calculator uses a weighted modifier system that calculates deviation from optimal health values. The formula is:
 
-| Factor | Optimal Value | Weight | Impact |
+```
+Final Age = Base Life Expectancy + Σ((User Value - Optimal Value) × Weight)
+```
+
+**How it works:**
+- Start with a base life expectancy of 78 years
+- For each health factor, calculate how far the user's answer is from the optimal value
+- Multiply this deviation by the factor's weight
+- Positive weights reward good choices above optimal (e.g., more exercise)
+- Negative weights penalize any deviation from optimal (e.g., too much or too little sleep)
+
+| Factor | Optimal Value | Weight | Effect |
 |--------|--------------|--------|---------|
-| Coffee/Caffeine | 2 cups/day | -0.5 | Negative when deviating |
-| Sleep | 7 hours/night | -1.5 | Strong negative impact |
-| Exercise | 3 days/week | +0.8 | Positive impact |
-| Stress Level | 5/10 | -1.2 | Negative impact |
-| Diet Quality | 5/10 | +1.5 | Strong positive impact |
-| Social Activity | 5/10 | +0.3 | Mild positive impact |
-| Screen Time | 4 hours/day | -0.4 | Negative impact |
+| Coffee/Caffeine | 2 cups/day | -0.5 | Penalized when deviating in either direction |
+| Sleep | 7 hours/night | -1.5 | Strong penalty for too much or too little sleep |
+| Exercise | 3 days/week | +0.8 | Reward for exercising more, penalty for less |
+| Stress Level | 5/10 | -1.2 | Penalized when too stressed or too relaxed |
+| Diet Quality | 5/10 | +1.5 | Strong reward for healthier eating |
+| Social Activity | 5/10 | +0.3 | Mild reward for being more social |
+| Screen Time | 4 hours/day | -0.4 | Penalized for excessive screen time |
 
-**Base Life Expectancy**: 78 years (global average)
+**Example:** If you exercise 5 days/week (optimal is 3), the modifier is (5 - 3) × 0.8 = +1.6 years added to your life expectancy.
 
-The final result is calculated by:
-1. Starting with base life expectancy (78)
-2. Adding/subtracting modifiers based on deviation from optimal values
-3. Constraining the result between (current age + 1) and 120
+**Constraints:** The final result is bounded between (your current age + 1) and 120 years to ensure realistic results.
 
 ## 🎨 Design Philosophy
 

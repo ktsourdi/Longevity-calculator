@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './page.module.css'
 
 /**
@@ -170,8 +170,8 @@ function getRoast(age: number): string[] {
   if (age < 70) return ['mid', 'just mid', 'nothing special']
   if (age < 80) return ['average', 'congrats i guess?', 'basic lifespan achieved']
   if (age < 90) return ['decent', 'might make it to retirement', 'respect']
-  if (age < 100) return ['living ur best life', 'goals fr', 'built different']
-  return ['legend', 'u built different', 'actually how']
+  if (age < 100) return ['living ur best life', 'goals fr', 'immortal vibes']
+  return ['legend status', 'absolutely built different', 'teach us ur ways']
 }
 
 /**
@@ -188,7 +188,7 @@ export default function Home() {
     setRandomEmoji(RANDOM_EMOJIS[Math.floor(Math.random() * RANDOM_EMOJIS.length)])
   }, [step])
 
-  const currentQuestion = useMemo(() => QUESTIONS[step], [step])
+  const currentQuestion = QUESTIONS[step]
 
   /**
    * Handles moving to the next question or calculating result
@@ -274,6 +274,7 @@ export default function Home() {
               className={styles.progressFill}
               style={{ width: `${((step + 1) / QUESTIONS.length) * 100}%` }}
               role="progressbar"
+              aria-label="Question progress"
               aria-valuenow={step + 1}
               aria-valuemin={1}
               aria-valuemax={QUESTIONS.length}
