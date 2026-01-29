@@ -108,18 +108,18 @@ Final Age = Base Life Expectancy + Σ((User Value - Optimal Value) × Weight)
 - Start with a base life expectancy of 78 years
 - For each health factor, calculate how far the user's answer is from the optimal value
 - Multiply this deviation by the factor's weight
-- Positive weights reward good choices above optimal (e.g., more exercise)
-- Negative weights penalize any deviation from optimal (e.g., too much or too little sleep)
+- **Positive weights**: Add years for values above optimal, subtract years for values below optimal
+- **Negative weights**: Penalize any deviation from optimal in either direction (both above and below)
 
 | Factor | Optimal Value | Weight | Effect |
 |--------|--------------|--------|---------|
 | Coffee/Caffeine | 2 cups/day | -0.5 | Penalized when deviating in either direction |
 | Sleep | 7 hours/night | -1.5 | Strong penalty for too much or too little sleep |
-| Exercise | 3 days/week | +0.8 | Reward for exercising more, penalty for less |
+| Exercise | 3 days/week | +0.8 | Reward for exercising more, penalty for exercising less |
 | Stress Level | 5/10 | -1.2 | Penalized when too stressed or too relaxed |
-| Diet Quality | 5/10 | +1.5 | Strong reward for healthier eating |
-| Social Activity | 5/10 | +0.3 | Mild reward for being more social |
-| Screen Time | 4 hours/day | -0.4 | Penalized for excessive screen time |
+| Diet Quality | 5/10 | +1.5 | Strong reward for healthier eating, penalty for poor diet |
+| Social Activity | 5/10 | +0.3 | Mild reward for being more social, penalty for being less social |
+| Screen Time | 4 hours/day | -0.4 | Penalized for deviating from optimal screen time |
 
 **Example:** If you exercise 5 days/week (optimal is 3), the modifier is (5 - 3) × 0.8 = +1.6 years added to your life expectancy.
 
