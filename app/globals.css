@@ -1,9 +1,16 @@
+/**
+ * Global styles for the Longevity Calculator application
+ * Sets up base styles, resets, and background effects
+ */
+
+/* CSS Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Base body styles with dark theme */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -16,6 +23,7 @@ body {
   overflow-x: hidden;
 }
 
+/* Animated gradient background effect */
 body::before {
   content: '';
   position: fixed;
