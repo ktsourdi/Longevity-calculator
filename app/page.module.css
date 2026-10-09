@@ -8,22 +8,27 @@
 /* Main container with centered content */
 .container {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
   padding: 20px;
   position: relative;
   overflow: hidden;
 }
 
-/* Rotating gradient background animation */
+/* Rotating gradient background animation.
+   The layer is centered and at least 150vmax on each side so its corners
+   never rotate into view on tall phone screens. */
 .container::before {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: calc(50% - max(100%, 75vmax));
+  left: calc(50% - max(100%, 75vmax));
+  width: max(200%, 150vmax);
+  height: max(200%, 150vmax);
   background: 
     radial-gradient(circle at 20% 50%, rgba(255, 0, 150, 0.3) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.3) 0%, transparent 50%),
@@ -188,6 +193,7 @@
   line-height: 1.3;
   text-transform: lowercase;
   letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
 /* Question subtext/hint */
@@ -221,6 +227,18 @@
   box-shadow: 0 0 0 4px rgba(255, 0, 255, 0.1);
 }
 
+/* Hide the spinner arrows; the field is easier to type into without them */
+.numberInput::-webkit-outer-spin-button,
+.numberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numberInput {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .numberInput::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }
@@ -240,15 +258,38 @@
   line-height: 1;
 }
 
-/* Range slider input */
+/* Range slider input: a tall transparent hit area with a thin visible track */
 .rangeInput {
+  display: block;
   width: 100%;
+  height: 36px;
+  background: transparent;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: -4px 0 0;
+  cursor: pointer;
+}
+
+.rangeInput::-webkit-slider-runnable-track {
   height: 8px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.1);
-  outline: none;
-  -webkit-appearance: none;
-  margin-bottom: 12px;
+}
+
+.rangeInput::-moz-range-track {
+  height: 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Keyboard focus ring on the slider thumb */
+.rangeInput:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px #000, 0 0 0 7px #00ffff, 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.rangeInput:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px #000, 0 0 0 7px #00ffff, 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* WebKit slider thumb styling */
@@ -260,12 +301,15 @@
   border-radius: 50%;
   background: linear-gradient(135deg, #ff0080, #00ffff);
   cursor: pointer;
+  margin-top: -10px;
   box-shadow: 0 0 0 4px rgba(255, 0, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s ease;
 }
 
-.rangeInput::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
+@media (hover: hover) {
+  .rangeInput::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
 }
 
 /* Firefox slider thumb styling */
@@ -281,6 +325,7 @@
 
 /* Range slider labels */
 .rangeLabels {
+  margin-top: 4px;
   display: flex;
   justify-content: space-between;
   font-size: 0.85rem;
@@ -325,17 +370,35 @@
   transition: left 0.5s ease;
 }
 
-.button:hover::before {
-  left: 100%;
-}
+/* Hover effects only on devices that really hover, so they don't stick after a tap */
+@media (hover: hover) {
+  .button:hover::before {
+    left: 100%;
+  }
 
-.button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(255, 0, 255, 0.5);
+  .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(255, 0, 255, 0.5);
+  }
 }
 
 .button:active {
   transform: translateY(0);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Shared keyboard focus ring */
+.button:focus-visible,
+.buttonSecondary:focus-visible,
+.creditLink:focus-visible {
+  outline: 3px solid #00ffff;
+  outline-offset: 3px;
 }
 
 /* Secondary button (outlined) */
@@ -352,9 +415,17 @@
   text-transform: lowercase;
 }
 
-.buttonSecondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.4);
+@media (hover: hover) {
+  .buttonSecondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Headings receive focus when the screen changes; no ring needed there */
+.question:focus,
+.resultTitle:focus {
+  outline: none;
 }
 
 /* === RESULTS === */
@@ -412,6 +483,34 @@
   text-transform: lowercase;
 }
 
+/* === CREDIT === */
+
+.credit {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.creditLink {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .creditLink:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
 /* === RESPONSIVE DESIGN === */
 
 @media (max-width: 768px) {
@@ -442,5 +541,93 @@
 
   .rangeValue {
     font-size: 2.5rem;
+  }
+}
+
+/* Small or short phones: tighten vertical rhythm so the whole step fits */
+@media (max-width: 380px), (max-height: 700px) {
+  .container {
+    padding: 12px;
+    gap: 4px;
+  }
+
+  .card,
+  .resultCard {
+    padding: 20px 18px;
+    border-radius: 20px;
+  }
+
+  .titleMain {
+    font-size: 1.6rem;
+  }
+
+  .title,
+  .progressContainer {
+    margin-bottom: 20px;
+  }
+
+  .questionContainer {
+    margin-bottom: 20px;
+  }
+
+  .emoji {
+    font-size: 2.4rem;
+    margin-bottom: 8px;
+  }
+
+  .resultEmoji {
+    font-size: 3rem;
+    margin-bottom: 8px;
+  }
+
+  .question {
+    font-size: 1.25rem;
+  }
+
+  .subtext {
+    margin-bottom: 16px;
+  }
+
+  .rangeContainer {
+    margin-top: 12px;
+  }
+
+  .rangeValue {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+  }
+
+  .deathAge {
+    font-size: 4.5rem;
+    margin: 16px 0;
+  }
+
+  .roastContainer {
+    margin: 16px 0;
+    gap: 4px;
+  }
+
+  .button,
+  .buttonSecondary {
+    padding: 14px 22px;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .container::before,
+  .progressFill,
+  .emoji,
+  .resultEmoji,
+  .deathAge {
+    animation: none;
+  }
+
+  .button,
+  .button::before,
+  .buttonSecondary,
+  .progressFill,
+  .rangeInput::-webkit-slider-thumb {
+    transition: none;
   }
 }

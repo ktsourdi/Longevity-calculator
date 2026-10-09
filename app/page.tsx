@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, type FormEvent } from 'react'
 import styles from './page.module.css'
 
 /**
@@ -44,6 +44,13 @@ const DEFAULT_ANSWERS: Answers = {
   social: 3,
   screen: 6
 }
+
+// Allowed range for the age question
+const MIN_AGE = 1
+const MAX_AGE = 120
+
+// Studio credit shown under the card
+const CREDIT_URL = 'https://www.hellenicweb3.com'
 
 // Base life expectancy (average)
 const BASE_LIFE_EXPECTANCY = 78
@@ -175,6 +182,19 @@ function getRoast(age: number): string[] {
 }
 
 /**
+ * Small credit line shown under the card on every screen
+ */
+function Credit() {
+  return (
+    <footer className={styles.credit}>
+      <a href={CREDIT_URL} target="_blank" rel="noopener noreferrer" className={styles.creditLink}>
+        Made by Hellenic Web3 Studio
+      </a>
+    </footer>
+  )
+}
+
+/**
  * Main component for the longevity calculator app
  */
 export default function Home() {
@@ -182,23 +202,50 @@ export default function Home() {
   const [answers, setAnswers] = useState<Answers>(DEFAULT_ANSWERS)
   const [deathAge, setDeathAge] = useState<number | null>(null)
   const [randomEmoji, setRandomEmoji] = useState('💀')
+  // The age field keeps its raw text so it can be cleared and retyped freely
+  const [ageInput, setAgeInput] = useState(String(DEFAULT_ANSWERS.age))
+  const resultTitleRef = useRef<HTMLHeadingElement>(null)
+  const questionRef = useRef<HTMLHeadingElement>(null)
+  const hasMounted = useRef(false)
 
   // Update emoji on each step change
   useEffect(() => {
     setRandomEmoji(RANDOM_EMOJIS[Math.floor(Math.random() * RANDOM_EMOJIS.length)])
   }, [step])
 
+  // Move focus to the new screen's heading after showing or leaving the result
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true
+      return
+    }
+    if (deathAge !== null) {
+      resultTitleRef.current?.focus()
+    } else {
+      questionRef.current?.focus()
+    }
+  }, [deathAge])
+
   const currentQuestion = QUESTIONS[step]
+  const ageIsValid = !Number.isNaN(parseInt(ageInput, 10))
 
   /**
    * Handles moving to the next question or calculating result
    */
-  const handleNext = () => {
+  const handleNext = (event?: FormEvent) => {
+    event?.preventDefault()
+    let current = answers
+    if (currentQuestion.id === 'age') {
+      if (!ageIsValid) return
+      const age = Math.min(MAX_AGE, Math.max(MIN_AGE, parseInt(ageInput, 10)))
+      current = { ...answers, age }
+      setAnswers(current)
+      setAgeInput(String(age))
+    }
     if (step < QUESTIONS.length - 1) {
       setStep(step + 1)
     } else {
-      const age = calculateDeathAge(answers)
-      setDeathAge(age)
+      setDeathAge(calculateDeathAge(current))
     }
   }
 
@@ -225,16 +272,17 @@ export default function Home() {
     setStep(0)
     setDeathAge(null)
     setAnswers(DEFAULT_ANSWERS)
+    setAgeInput(String(DEFAULT_ANSWERS.age))
   }
 
   // Result screen
   if (deathAge !== null) {
     const roasts = getRoast(deathAge)
     return (
-      <div className={styles.container}>
+      <main className={styles.container}>
         <div className={styles.resultCard}>
-          <div className={styles.resultEmoji}>{randomEmoji}</div>
-          <h1 className={styles.resultTitle}>ur gonna die at</h1>
+          <div className={styles.resultEmoji} aria-hidden="true">{randomEmoji}</div>
+          <h1 className={styles.resultTitle} ref={resultTitleRef} tabIndex={-1}>ur gonna die at</h1>
           <div className={styles.deathAge}>{deathAge}</div>
           <div className={styles.roastContainer}>
             {roasts.map((roast, i) => (
@@ -244,22 +292,23 @@ export default function Home() {
           <p className={styles.disclaimer}>
             *this is 100% real science trust
           </p>
-          <button 
+          <button
+            type="button"
             className={styles.button}
             onClick={handleReset}
-            aria-label="Restart questionnaire"
           >
             do it again (maybe lie this time)
           </button>
         </div>
-      </div>
+        <Credit />
+      </main>
     )
   }
 
   // Questionnaire screen
   return (
-    <div className={styles.container}>
-      <div className={styles.card}>
+    <main className={styles.container}>
+      <form className={styles.card} onSubmit={handleNext} noValidate>
         <h1 className={styles.title}>
           <span className={styles.titleMain}>when r u gonna die</span>
           <span className={styles.titleSub}>death age calculator</span>
@@ -269,22 +318,25 @@ export default function Home() {
           <div className={styles.progressText}>
             {step + 1}/{QUESTIONS.length}
           </div>
-          <div className={styles.progressBar}>
-            <div 
+          <div
+            className={styles.progressBar}
+            role="progressbar"
+            aria-label="Question progress"
+            aria-valuenow={step + 1}
+            aria-valuemin={1}
+            aria-valuemax={QUESTIONS.length}
+            aria-valuetext={`question ${step + 1} of ${QUESTIONS.length}`}
+          >
+            <div
               className={styles.progressFill}
               style={{ width: `${((step + 1) / QUESTIONS.length) * 100}%` }}
-              role="progressbar"
-              aria-label="Question progress"
-              aria-valuenow={step + 1}
-              aria-valuemin={1}
-              aria-valuemax={QUESTIONS.length}
             />
           </div>
         </div>
 
         <div className={styles.questionContainer}>
           <div className={styles.emoji} aria-hidden="true">{randomEmoji}</div>
-          <h2 className={styles.question}>
+          <h2 className={styles.question} ref={questionRef} tabIndex={-1}>
             {currentQuestion.question}
           </h2>
           {currentQuestion.subtext && (
@@ -294,10 +346,11 @@ export default function Home() {
           {currentQuestion.type === 'number' ? (
             <input
               type="number"
+              inputMode="numeric"
               min={currentQuestion.min}
               max={currentQuestion.max}
-              value={answers[currentQuestion.id]}
-              onChange={(e) => handleChange(currentQuestion.id, parseInt(e.target.value) || 0)}
+              value={ageInput}
+              onChange={(e) => setAgeInput(e.target.value)}
               className={styles.numberInput}
               aria-label={currentQuestion.question}
             />
@@ -311,7 +364,7 @@ export default function Home() {
                 min={currentQuestion.min}
                 max={currentQuestion.max}
                 value={answers[currentQuestion.id]}
-                onChange={(e) => handleChange(currentQuestion.id, parseInt(e.target.value))}
+                onChange={(e) => handleChange(currentQuestion.id, parseInt(e.target.value, 10))}
                 className={styles.rangeInput}
                 aria-label={currentQuestion.question}
               />
@@ -325,23 +378,24 @@ export default function Home() {
 
         <div className={styles.buttonContainer}>
           {step > 0 && (
-            <button 
-              className={styles.buttonSecondary} 
+            <button
+              type="button"
+              className={styles.buttonSecondary}
               onClick={handleBack}
-              aria-label="Go to previous question"
             >
               back
             </button>
           )}
-          <button 
-            className={styles.button} 
-            onClick={handleNext}
-            aria-label={step === QUESTIONS.length - 1 ? 'Calculate result' : 'Go to next question'}
+          <button
+            type="submit"
+            className={styles.button}
+            disabled={currentQuestion.id === 'age' && !ageIsValid}
           >
             {step === QUESTIONS.length - 1 ? 'show me' : 'next'}
           </button>
         </div>
-      </div>
-    </div>
+      </form>
+      <Credit />
+    </main>
   )
 }
